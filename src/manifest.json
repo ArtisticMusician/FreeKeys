@@ -1,0 +1,14 @@
+{
+  "manifestVersion": 5,
+  "id": "com.josh.freekeys",
+  "name": "Free Keys",
+  "version": "0.1.0",
+  "main": "index.html",
+  "host": {
+    "app": "PS",
+    "minVersion": "24.0"
+  },
+  "icons": [
+    { "path": "icons/icon.png", "width": 48, "height": 48 }
+  ]
+}
