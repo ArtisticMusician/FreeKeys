@@ -1,26 +1,107 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>Free Keys</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <div class="panel">
-    <h1>Free Keys</h1>
-    
-    <label>
-      <input type="checkbox" id="universal-modifier-toggle" checked>
-      <span>Universal Modifier Mode (every first key is a modifier — sequential two-key system)</span>
-    </label>
+  <head>
+    <meta charset="utf-8" />
+    <title>Free Keys</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="hud-toast"><span id="hud-message"></span></div>
+    <div class="panel">
+      <div class="header-actions">
+        <button id="export-btn" class="btn-secondary" style="margin-top: 0">
+          Export Profile
+        </button>
+        <button id="import-btn" class="btn-secondary" style="margin-top: 0">
+          Import Profile
+        </button>
+        <input
+          type="file"
+          id="import-file"
+          accept=".json"
+          style="display: none"
+        />
+      </div>
+      <h1>Free Keys</h1>
 
-    <input type="text" id="search" placeholder="Search shortcuts...">
-    
-    <div id="keymap-list"></div>
-    
-    <button id="add-new">+ Add New Shortcut</button>
-  </div>
+      <label>
+        <input type="checkbox" id="universal-modifier-toggle" checked />
+        <span
+          >Universal Modifier Mode (every first key is a modifier — sequential
+          two-key system)</span
+        >
+      </label>
 
-  <script src="main.js"></script>
-</body>
+      <input type="text" id="search" placeholder="Search shortcuts..." />
+
+      <div id="keymap-list"></div>
+
+      <button id="add-new">+ Add New Shortcut</button>
+
+      <div id="add-new-form">
+        <h3>Create Shortcut</h3>
+        <label>Shortcut Key(s)</label>
+        <input
+          type="text"
+          id="new-shortcut-key"
+          placeholder="e.g. Shift+S+M"
+          readonly
+        />
+        <small style="display: block; margin-bottom: 12px; color: #888"
+          >Click above and press the keys you want to assign.</small
+        >
+
+        <label>Command</label>
+        <select id="new-command-select"></select>
+
+        <div class="form-actions">
+          <button id="save-new-btn" class="btn-primary">Save</button>
+          <button id="cancel-new-btn" class="btn-secondary">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="main.js"></script>
+
+    <!-- Conflict Resolver Modal -->
+    <div id="conflict-modal" class="modal-overlay">
+      <div class="modal">
+        <h2>⚠️ Shortcut Conflict Detected</h2>
+        <p>The shortcut you are trying to assign is already in use.</p>
+
+        <div class="conflict-columns">
+          <div class="conflict-col">
+            <h3>New Assignment</h3>
+            <div class="mapping-detail">
+              Shortcut: <strong id="conflict-new-key"></strong>
+            </div>
+            <div class="mapping-detail">
+              Command: <strong id="conflict-new-cmd"></strong>
+            </div>
+          </div>
+
+          <div class="conflict-col">
+            <h3>Existing Assignment</h3>
+            <div class="mapping-detail">
+              Shortcut: <strong id="conflict-old-key"></strong>
+            </div>
+            <div class="mapping-detail">
+              Command: <strong id="conflict-old-cmd"></strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button id="modal-btn-cancel" class="btn-secondary">Cancel</button>
+          <button id="modal-btn-suggest" class="btn-secondary">
+            Suggest Alt for Old
+          </button>
+          <button id="modal-btn-keep-new" class="btn-primary">
+            Keep New (Remove Old)
+          </button>
+        </div>
+      </div>
+    </div>
+  </body>
+
 </html>
