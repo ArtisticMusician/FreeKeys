@@ -145,12 +145,50 @@ async function executePhotoshopCommand(commandId) {
   try {
     const photoshop = require("photoshop");
     const core = photoshop.core;
-    const app = photoshop.app;
+    const action = photoshop.action;
 
+    // Photoshop native commands are often executed using batchPlay with the select command
+    // and the command's string ID if it's a known menu command, or triggering tools via select.
     if (core && core.executeAsModal) {
       await core.executeAsModal(
         async () => {
-          app.performCommand(commandId);
+          // Fallback to basic tools
+          if (
+            commandId.startsWith("tool.") ||
+            commandId.startsWith("select.")
+          ) {
+            let toolName = commandId.split(".")[1]; // e.g. "marquee" from "select.marquee"
+            if (toolName === "marquee") toolName = "marqueeRectTool";
+            if (toolName === "magicWand") toolName = "magicWandTool";
+            if (toolName === "brush") toolName = "paintbrushTool";
+
+            await action.batchPlay(
+              [
+                {
+                  _obj: "select",
+                  _target: [{ _ref: toolName }],
+                },
+              ],
+              {},
+            );
+          } else {
+            // Let's try native menu command invocation
+            await action.batchPlay(
+              [
+                {
+                  _obj: "select",
+                  _target: [
+                    {
+                      _ref: "menuItemClass",
+                      _enum: "menuItemType",
+                      _value: commandId,
+                    },
+                  ],
+                },
+              ],
+              {},
+            );
+          }
         },
         { commandName: "FreeKeys: " + commandId },
       );
