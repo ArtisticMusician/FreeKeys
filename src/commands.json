@@ -1,36 +1,77 @@
 {
-  "commands": [
-    { "id": "select.marquee", "name": "Marquee Selection Tool" },
-    { "id": "select.lasso", "name": "Lasso Tool" },
-    { "id": "select.magicWand", "name": "Magic Wand Tool" },
-    { "id": "tool.brush", "name": "Brush Tool" },
-    { "id": "tool.eraser", "name": "Eraser Tool" },
-    { "id": "tool.cloneStamp", "name": "Clone Stamp Tool" },
-    { "id": "tool.gradient", "name": "Gradient Tool" },
-    { "id": "tool.text", "name": "Horizontal Type Tool" },
-    { "id": "tool.pen", "name": "Pen Tool" },
-    { "id": "tool.move", "name": "Move Tool" },
-    { "id": "tool.crop", "name": "Crop Tool" },
-    { "id": "tool.eyedropper", "name": "Eyedropper Tool" },
-    { "id": "tool.hand", "name": "Hand Tool" },
-    { "id": "tool.zoom", "name": "Zoom Tool" },
-    { "id": "layer.new", "name": "New Layer" },
-    { "id": "layer.delete", "name": "Delete Layer" },
-    { "id": "layer.duplicate", "name": "Duplicate Layer" },
-    { "id": "layer.mergeDown", "name": "Merge Down" },
-    { "id": "layer.sendToLayersPanel", "name": "Send to Layers Panel" },
-    { "id": "image.adjustments.levels", "name": "Levels" },
-    { "id": "image.adjustments.curves", "name": "Curves" },
-    { "id": "image.adjustments.hueSaturation", "name": "Hue/Saturation" },
-    { "id": "image.adjustments.colorBalance", "name": "Color Balance" },
-    { "id": "image.size", "name": "Image Size" },
-    { "id": "canvas.size", "name": "Canvas Size" },
-    { "id": "file.save", "name": "Save" },
-    { "id": "file.saveAs", "name": "Save As" },
-    { "id": "file.exportAs", "name": "Export As" },
-    { "id": "edit.undo", "name": "Undo" },
-    { "id": "edit.redo", "name": "Redo" },
-    { "id": "edit.copy", "name": "Copy" },
-    { "id": "edit.paste", "name": "Paste" }
+  "categories": [
+    {
+      "name": "Tools",
+      "commands": [
+        { "id": "tool.move", "name": "Move Tool" },
+        { "id": "tool.marquee", "name": "Rectangular Marquee Tool" },
+        { "id": "tool.lasso", "name": "Lasso Tool" },
+        { "id": "tool.magicWand", "name": "Magic Wand Tool" },
+        { "id": "tool.crop", "name": "Crop Tool" },
+        { "id": "tool.eyedropper", "name": "Eyedropper Tool" },
+        { "id": "tool.brush", "name": "Brush Tool" },
+        { "id": "tool.cloneStamp", "name": "Clone Stamp Tool" },
+        { "id": "tool.eraser", "name": "Eraser Tool" },
+        { "id": "tool.gradient", "name": "Gradient Tool" },
+        { "id": "tool.text", "name": "Horizontal Type Tool" },
+        { "id": "tool.pen", "name": "Pen Tool" },
+        { "id": "tool.hand", "name": "Hand Tool" },
+        { "id": "tool.zoom", "name": "Zoom Tool" }
+      ]
+    },
+    {
+      "name": "File",
+      "commands": [
+        { "id": "file.new", "name": "New..." },
+        { "id": "file.open", "name": "Open..." },
+        { "id": "file.save", "name": "Save" },
+        { "id": "file.saveAs", "name": "Save As..." },
+        { "id": "file.exportAs", "name": "Export As..." },
+        { "id": "file.close", "name": "Close" }
+      ]
+    },
+    {
+      "name": "Edit",
+      "commands": [
+        { "id": "edit.undo", "name": "Undo" },
+        { "id": "edit.redo", "name": "Redo" },
+        { "id": "edit.cut", "name": "Cut" },
+        { "id": "edit.copy", "name": "Copy" },
+        { "id": "edit.paste", "name": "Paste" },
+        { "id": "edit.fill", "name": "Fill..." },
+        { "id": "edit.stroke", "name": "Stroke..." }
+      ]
+    },
+    {
+      "name": "Image",
+      "commands": [
+        { "id": "image.size", "name": "Image Size..." },
+        { "id": "canvas.size", "name": "Canvas Size..." },
+        { "id": "image.adjustments.levels", "name": "Levels..." },
+        { "id": "image.adjustments.curves", "name": "Curves..." },
+        { "id": "image.adjustments.hueSaturation", "name": "Hue/Saturation..." },
+        { "id": "image.adjustments.colorBalance", "name": "Color Balance..." }
+      ]
+    },
+    {
+      "name": "Layer",
+      "commands": [
+        { "id": "layer.new", "name": "New Layer" },
+        { "id": "layer.delete", "name": "Delete Layer" },
+        { "id": "layer.duplicate", "name": "Duplicate Layer" },
+        { "id": "layer.mergeDown", "name": "Merge Down" },
+        { "id": "layer.flattenImage", "name": "Flatten Image" },
+        { "id": "layer.sendToLayersPanel", "name": "Send to Layers Panel" }
+      ]
+    },
+    {
+      "name": "Select",
+      "commands": [
+        { "id": "select.all", "name": "All" },
+        { "id": "select.deselect", "name": "Deselect" },
+        { "id": "select.reselect", "name": "Reselect" },
+        { "id": "select.inverse", "name": "Inverse" }
+      ]
+    }
   ]
 }

@@ -216,3 +216,85 @@ label {
   gap: 8px;
   margin-bottom: 16px;
 }
+
+/* New List Layout */
+.table-header {
+    display: flex;
+    font-weight: bold;
+    color: #888;
+    border-bottom: 1px solid #444;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+}
+.th-command {
+    flex: 1;
+}
+.th-shortcut {
+    width: 200px;
+    text-align: right;
+    padding-right: 32px;
+}
+
+.category-header {
+    background: #333;
+    padding: 6px 12px;
+    font-weight: bold;
+    margin-top: 12px;
+    border-radius: 4px;
+}
+
+.command-row {
+    display: flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-bottom: 1px solid #333;
+}
+.command-row:hover {
+    background: #2a2a2a;
+}
+
+.command-name {
+    flex: 1;
+}
+
+.shortcut-cell {
+    width: 200px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.shortcut-input {
+    background: transparent;
+    border: 1px solid transparent;
+    color: #00ff88;
+    text-align: right;
+    font-family: monospace;
+    font-size: 14px;
+    padding: 4px;
+    width: 150px;
+    cursor: pointer;
+    margin: 0;
+}
+.shortcut-input:hover {
+    border-color: #555;
+}
+.shortcut-input:focus, .shortcut-input.recording {
+    background: #111;
+    border-color: #00ff88;
+    outline: none;
+    color: #fff;
+    cursor: text;
+}
+
+.inline-delete {
+    background: transparent;
+    border: none;
+    color: #888;
+    margin-left: 8px;
+    cursor: pointer;
+    font-size: 12px;
+}
+.inline-delete:hover {
+    color: #ff4444;
+}

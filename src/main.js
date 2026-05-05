@@ -6,13 +6,13 @@ const STORAGE_KEY = "freeKeys_mappings";
 let state = {
   mode: "universal", // "plain" | "universal"
   mappings: {
-    S: { command: "select.marquee" },
+    S: { command: "tool.marquee" },
     "Shift+S": { command: "layer.sendToLayersPanel" },
     "Shift+S+M": { command: "tool.move" },
   },
 };
 
-let commandsList = [];
+let commandsCategories = [];
 
 // Load from local storage
 function loadSettings() {
@@ -39,10 +39,19 @@ async function loadCommands() {
   try {
     const response = await fetch("./commands.json");
     const data = await response.json();
-    commandsList = data.commands;
+    commandsCategories = data.categories;
   } catch (e) {
     console.error("Failed to load commands", e);
   }
+}
+
+// Flat lookup for command names
+function getCommandInfo(id) {
+    for (const cat of commandsCategories) {
+        const cmd = cat.commands.find(c => c.id === id);
+        if (cmd) return cmd;
+    }
+    return null;
 }
 
 // --- UI Elements ---
@@ -55,13 +64,7 @@ const exportBtn = document.getElementById("export-btn");
 const importBtn = document.getElementById("import-btn");
 const importFileInput = document.getElementById("import-file");
 
-// Form Elements
-const addNewBtn = document.getElementById("add-new");
-const addNewForm = document.getElementById("add-new-form");
-const newShortcutKeyInput = document.getElementById("new-shortcut-key");
-const newCommandSelect = document.getElementById("new-command-select");
-const saveNewBtn = document.getElementById("save-new-btn");
-const cancelNewBtn = document.getElementById("cancel-new-btn");
+// Form Elements removed (replaced by inline editing)
 
 // Modal Elements
 const conflictModal = document.getElementById("conflict-modal");
@@ -94,49 +97,125 @@ searchInput.addEventListener("input", () => {
   renderKeymap(searchInput.value);
 });
 
+// --- Get Shortcut for Command ---
+function getShortcutForCommand(commandId) {
+  for (const [shortcut, mapping] of Object.entries(state.mappings)) {
+    if (mapping.command === commandId) {
+      return shortcut;
+    }
+  }
+  return null;
+}
+
 // --- Rendering ---
 function renderKeymap(filterText = "") {
   keymapListContainer.innerHTML = "";
-
   const lowerFilter = filterText.toLowerCase();
 
-  for (const [shortcut, mapping] of Object.entries(state.mappings)) {
-    if (
-      lowerFilter &&
-      !shortcut.toLowerCase().includes(lowerFilter) &&
-      !mapping.command.toLowerCase().includes(lowerFilter)
-    ) {
-      continue;
-    }
-
-    const commandInfo = commandsList.find((c) => c.id === mapping.command);
-    const commandName = commandInfo ? commandInfo.name : mapping.command;
-
-    const row = document.createElement("div");
-    row.className = "mapping-row";
-
-    const shortcutEl = document.createElement("span");
-    shortcutEl.className = "mapping-shortcut";
-    shortcutEl.textContent = shortcut;
-
-    const commandEl = document.createElement("span");
-    commandEl.className = "mapping-command";
-    commandEl.textContent = commandName;
-
-    const deleteBtn = document.createElement("button");
-    deleteBtn.className = "delete-btn";
-    deleteBtn.textContent = "✖";
-    deleteBtn.addEventListener("click", () => {
-      delete state.mappings[shortcut];
-      saveSettings();
-      renderKeymap(searchInput.value);
+  for (const cat of commandsCategories) {
+    // Filter commands in category
+    const visibleCommands = cat.commands.filter(cmd => {
+      if (!lowerFilter) return true;
+      const shortcut = getShortcutForCommand(cmd.id) || "";
+      return cmd.name.toLowerCase().includes(lowerFilter) || shortcut.toLowerCase().includes(lowerFilter);
     });
 
-    row.appendChild(shortcutEl);
-    row.appendChild(commandEl);
-    row.appendChild(deleteBtn);
-    keymapListContainer.appendChild(row);
+    if (visibleCommands.length === 0) continue;
+
+    // Render Category Header
+    const catHeader = document.createElement("div");
+    catHeader.className = "category-header";
+    catHeader.textContent = cat.name;
+    keymapListContainer.appendChild(catHeader);
+
+    // Render Commands
+    visibleCommands.forEach(cmd => {
+      const row = document.createElement("div");
+      row.className = "command-row";
+
+      const commandNameEl = document.createElement("div");
+      commandNameEl.className = "command-name";
+      commandNameEl.textContent = cmd.name;
+
+      const shortcutCell = document.createElement("div");
+      shortcutCell.className = "shortcut-cell";
+
+      const shortcutInput = document.createElement("input");
+      shortcutInput.type = "text";
+      shortcutInput.readOnly = true;
+      shortcutInput.className = "shortcut-input";
+
+      const existingShortcut = getShortcutForCommand(cmd.id);
+      if (existingShortcut) {
+        shortcutInput.value = existingShortcut;
+      } else {
+        shortcutInput.placeholder = "Click to add shortcut...";
+      }
+
+      shortcutInput.addEventListener('focus', () => {
+         isRecordingShortcut = true;
+         recordedShortcut = null;
+         shortcutInput.placeholder = "Press key combo...";
+         shortcutInput.classList.add('recording');
+      });
+
+      shortcutInput.addEventListener('blur', () => {
+         setTimeout(() => {
+           isRecordingShortcut = false;
+           shortcutInput.classList.remove('recording');
+           if (recordedShortcut) {
+             // Let's attempt to save
+             handleShortcutAssignment(recordedShortcut, cmd.id);
+           } else {
+             // Just restore visual state
+             renderKeymap(searchInput.value);
+           }
+         }, 150);
+      });
+
+      // Special property to attach the target input so global keydown knows which one we are typing in
+      shortcutInput.dataset.commandId = cmd.id;
+
+      shortcutCell.appendChild(shortcutInput);
+
+      if (existingShortcut) {
+          const deleteBtn = document.createElement("button");
+          deleteBtn.className = "delete-btn inline-delete";
+          deleteBtn.textContent = "✖";
+          deleteBtn.title = "Remove shortcut";
+          deleteBtn.addEventListener('click', () => {
+             delete state.mappings[existingShortcut];
+             saveSettings();
+             renderKeymap(searchInput.value);
+          });
+          shortcutCell.appendChild(deleteBtn);
+      }
+
+      row.appendChild(commandNameEl);
+      row.appendChild(shortcutCell);
+      keymapListContainer.appendChild(row);
+    });
   }
+}
+
+function handleShortcutAssignment(shortcutStr, commandId) {
+    // Check for conflict
+    if (state.mappings[shortcutStr]) {
+        if (state.mappings[shortcutStr].command === commandId) return; // Same command mapped already
+
+        pendingConflictResolution = { key: shortcutStr, commandId: commandId };
+        showConflictModal(shortcutStr, commandId, state.mappings[shortcutStr].command);
+    } else {
+        // No conflict, remove old shortcut mapping if this command had one previously
+        const oldShortcut = getShortcutForCommand(commandId);
+        if (oldShortcut) {
+            delete state.mappings[oldShortcut];
+        }
+
+        state.mappings[shortcutStr] = { command: commandId };
+        saveSettings();
+        renderKeymap(searchInput.value);
+    }
 }
 
 // --- Photoshop Command Execution ---
@@ -276,7 +355,7 @@ function normalizeKeyCombo(e) {
 }
 
 document.addEventListener("keydown", (e) => {
-  if (isRecordingShortcut && e.target === newShortcutKeyInput) {
+  if (isRecordingShortcut && e.target.classList.contains("shortcut-input")) {
     e.preventDefault();
     e.stopPropagation();
 
@@ -295,14 +374,14 @@ document.addEventListener("keydown", (e) => {
           if (secondKey === " ") secondKey = "SPACE";
           recordedShortcut = recordedShortcut + "+" + secondKey;
           isRecordingShortcut = false;
-          newShortcutKeyInput.blur();
+          e.target.blur();
         }
       } else {
         recordedShortcut = combo;
         isRecordingShortcut = false;
-        newShortcutKeyInput.blur();
+        e.target.blur();
       }
-      newShortcutKeyInput.value = recordedShortcut;
+      e.target.value = recordedShortcut;
     }
     return;
   }
@@ -380,69 +459,10 @@ document.addEventListener("keyup", (e) => {
 // --- Init ---
 // --- Form & Key Editor Logic ---
 
-function populateCommandSelect() {
-  newCommandSelect.innerHTML = "";
-  commandsList.forEach((cmd) => {
-    const opt = document.createElement("option");
-    opt.value = cmd.id;
-    opt.textContent = cmd.name;
-    newCommandSelect.appendChild(opt);
-  });
-}
-
-addNewBtn.addEventListener("click", () => {
-  addNewForm.classList.add("active");
-  addNewBtn.style.display = "none";
-  newShortcutKeyInput.value = "";
-  recordedShortcut = null;
-});
-
-cancelNewBtn.addEventListener("click", () => {
-  addNewForm.classList.remove("active");
-  addNewBtn.style.display = "block";
-  isRecordingShortcut = false;
-});
-
-newShortcutKeyInput.addEventListener("focus", () => {
-  isRecordingShortcut = true;
-  newShortcutKeyInput.placeholder = "Press key combo now...";
-});
-
-newShortcutKeyInput.addEventListener("blur", () => {
-  setTimeout(() => {
-    isRecordingShortcut = false;
-  }, 100);
-});
-
-saveNewBtn.addEventListener("click", () => {
-  if (!recordedShortcut) {
-    alert("Please record a shortcut key first.");
-    return;
-  }
-  const commandId = newCommandSelect.value;
-
-  // Check for conflict
-  if (state.mappings[recordedShortcut]) {
-    // Conflict!
-    pendingConflictResolution = { key: recordedShortcut, commandId: commandId };
-    showConflictModal(
-      recordedShortcut,
-      commandId,
-      state.mappings[recordedShortcut].command,
-    );
-  } else {
-    // No conflict, just save
-    state.mappings[recordedShortcut] = { command: commandId };
-    saveSettings();
-    renderKeymap();
-    cancelNewBtn.click();
-  }
-});
-
 // --- Conflict Modal Logic ---
 
 function getCommandName(id) {
-  const cmd = commandsList.find((c) => c.id === id);
+  const cmd = getCommandInfo(id);
   return cmd ? cmd.name : id;
 }
 
@@ -465,34 +485,46 @@ modalBtnCancel.addEventListener("click", closeConflictModal);
 
 modalBtnKeepNew.addEventListener("click", () => {
   if (pendingConflictResolution) {
-    state.mappings[pendingConflictResolution.key] = {
-      command: pendingConflictResolution.commandId,
+    const { key, commandId } = pendingConflictResolution;
+    // Remove old shortcut if this command had one
+    const oldShortcut = getShortcutForCommand(commandId);
+    if (oldShortcut) {
+        delete state.mappings[oldShortcut];
+    }
+
+    state.mappings[key] = {
+      command: commandId,
     };
     saveSettings();
-    renderKeymap();
+    renderKeymap(searchInput.value);
     closeConflictModal();
-    cancelNewBtn.click(); // Close the add form
   }
 });
 
 modalBtnSuggest.addEventListener("click", () => {
   // Quick-remap old to a new suggestion (e.g. append +ALT)
   if (pendingConflictResolution) {
-    const oldCmd = state.mappings[pendingConflictResolution.key].command;
-    let suggestion = pendingConflictResolution.key + "+ALT";
+    const { key, commandId } = pendingConflictResolution;
+    const oldCmd = state.mappings[key].command;
+    let suggestion = key + "+ALT";
     if (suggestion.includes("ALT+ALT"))
       suggestion = suggestion.replace("+ALT", "+SHIFT"); // Just a dummy heuristic
 
+    // Remove old shortcut if this command had one
+    const oldShortcut = getShortcutForCommand(commandId);
+    if (oldShortcut) {
+        delete state.mappings[oldShortcut];
+    }
+
     state.mappings[suggestion] = { command: oldCmd };
-    state.mappings[pendingConflictResolution.key] = {
-      command: pendingConflictResolution.commandId,
+    state.mappings[key] = {
+      command: commandId,
     };
 
     alert(`Old command mapped to: ${suggestion}`);
     saveSettings();
-    renderKeymap();
+    renderKeymap(searchInput.value);
     closeConflictModal();
-    cancelNewBtn.click();
   }
 });
 
@@ -542,7 +574,7 @@ importFileInput.addEventListener("change", (e) => {
 
 async function init() {
   await loadCommands();
-  populateCommandSelect();
+
   loadSettings();
   console.log(
     "%c🚀 Free Keys loaded — Plain single-key mode ready!",
