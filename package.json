@@ -1,0 +1,24 @@
+{
+  "name": "free-keys-ps-plugin",
+  "version": "1.0.0",
+  "description": "**The ultimate keyboard shortcut freedom layer for Photoshop.**",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ArtisticMusician/FreeKeys.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ArtisticMusician/FreeKeys/issues"
+  },
+  "homepage": "https://github.com/ArtisticMusician/FreeKeys#readme"
+}
