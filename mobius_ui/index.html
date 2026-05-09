@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobius - 8 Track Loop Editor</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body id="app-container">
+
+    <!-- Top Bar / Header -->
+    <header id="app-header" class="header-footer-bar">
+        <div class="logo-area">
+            <h1>&#x221E; mobius</h1>
+        </div>
+        <div class="global-controls">
+            <button id="toggle-time-btn" class="btn">Time / Bars</button>
+            <button id="toggle-mixer-btn" class="btn">Toggle Mixer</button>
+            <button id="swap-layout-btn" class="btn">Swap Header/Footer</button>
+        </div>
+    </header>
+
+    <!-- Main Content Area: Tracks -->
+    <main id="app-main" class="main-content">
+        <div class="tracks-container" id="tracks-container">
+            <!-- Tracks will be generated here via JS -->
+        </div>
+    </main>
+
+    <!-- Bottom Bar / Footer (Transport) -->
+    <footer id="app-footer" class="header-footer-bar transport-bar">
+        <div class="transport-controls">
+            <button class="transport-btn stop-btn">&#9632;</button> <!-- Stop -->
+            <button class="transport-btn play-btn">&#9654;</button> <!-- Play -->
+            <button class="transport-btn loop-btn">&#x21BB;</button> <!-- Loop -->
+        </div>
+        <div class="tempo-control">
+            <span>Tempo: 120 BPM</span>
+        </div>
+        <div class="time-display" id="time-display">
+            00:00:00
+        </div>
+    </footer>
+
+    <!-- Floating Mixer Section -->
+    <div id="mixer-panel" class="floating-mixer hidden">
+        <div class="mixer-header">
+            <h3>Mixer</h3>
+            <button id="close-mixer-btn" class="close-btn">&times;</button>
+        </div>
+        <div class="mixer-channels" id="mixer-channels">
+            <!-- Channels will be generated here via JS -->
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
